@@ -1,10 +1,45 @@
 import express from "express"
-import dotenv from "dotenv"         //To hide sensitive information of server
+import dotenv from "dotenv"             //To hide sensitive information of server
+import logger from "./logger.js"       //For using advance loggers morgan and winston for storing logs and debugging
+import morgan from "morgan"
+
+dotenv.config({
+    path:"./.env"
+})
 
 const app=express()     //1. Creating Express application (that handles all http requests)
 const port=process.env.PORT||3000         //2. Define port for server
 
 app.use(express.json())     //Using middleware: Any data that comes in json format from frontend will be accepted
+
+const morganFormat=':method :url :status :response-time ms'
+
+/*Using middleware to get custom logs by morgan winston
+Morgan captures HTTP request info
+Instead of printing to console, it:
+Converts it into an object
+Sends it to Winston
+Result:
+Console → colored logs
+File → structured logs
+*/
+app.use(       
+  morgan(morganFormat, {
+    stream: {
+      write: (message) => {
+        const logObject = {
+          method: message.split(" ")[0],
+          url: message.split(" ")[1],
+          status: message.split(" ")[2],
+          responseTime: message.split(" ")[3],
+        };
+
+        logger.info(JSON.stringify(logObject));
+      },    
+    },
+  })
+);
+
 
 let teaData=[]
 let nextId=1

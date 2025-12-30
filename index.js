@@ -1,7 +1,8 @@
 import express from "express"
+import dotenv from "dotenv"         //To hide sensitive information of server
 
 const app=express()     //1. Creating Express application (that handles all http requests)
-const port=3000         //2. Define port for server
+const port=process.env.PORT||3000         //2. Define port for server
 
 app.use(express.json())     //Using middleware: Any data that comes in json format from frontend will be accepted
 
